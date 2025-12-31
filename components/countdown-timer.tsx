@@ -3,6 +3,7 @@ import { useContext, useEffect, useRef, useState } from 'react'
 import { Card, CardTitle } from './ui/card'
 import { Button } from './ui/button'
 import { Pause } from 'lucide-react'
+import Fireworks from './firework'
 
 
 
@@ -39,20 +40,23 @@ export default function NewYearCountdown({audioURL}:{audioURL:string}) {
   const hasCompleted = useRef(false)
   const audioRef = useRef<HTMLAudioElement>(null)
   
+  const [audioIsPlaying, setAudioIsPlaying] = useState(false)
   const [isClient, setIsClient] = useState(false)
   const [isLast10Seconds,setIsLast10Seconds] = useState(false)
   const [timeLeft, setTimeLeft] = useState(
     calculateTimeLeft(targetDate.current)
   )
 
+
   function onComplete(){
     audioRef.current?.play()
+    setAudioIsPlaying(true)
   }
 
   useEffect(() => {
     setIsClient(true)
 
-    const interval = setInterval(() => {
+    const countdownInterval = setInterval(() => {
       const updated = calculateTimeLeft(targetDate.current)
       setTimeLeft(updated)
 
@@ -71,11 +75,14 @@ export default function NewYearCountdown({audioURL}:{audioURL:string}) {
       ) {
         hasCompleted.current = true
         onComplete()
-        clearInterval(interval)
+        clearInterval(countdownInterval)
       }
     }, 1000)
 
-    return () => clearInterval(interval)
+
+    return () => {
+      clearInterval(countdownInterval)
+    }
   }, [])
 
   if (!isClient) {
@@ -83,51 +90,59 @@ export default function NewYearCountdown({audioURL}:{audioURL:string}) {
   }
 
   return (
-    <Card
-    className='flex flex-col gap-4 justify-center items-center w-96 text-4xl px-5
-    fixed left-[50%] top-[50%] -translate-x-1/2 -translate-y-1/2' >
-      <CardTitle
-      className=''>
-        <audio ref={audioRef} src={audioURL}/>
-        <div
+    <>
+      <Fireworks audioIsPlaying={audioIsPlaying}/>
+      <Card
+      className='flex flex-col gap-4 justify-center items-center w-96 text-4xl px-5
+      fixed left-[50%] top-[50%] -translate-x-1/2 -translate-y-1/2' >
+        <CardTitle
         className=''>
+          <audio ref={audioRef} src={audioURL}/>
+          <div
+          className=''>
 
-          {
-            hasCompleted.current ?
-            <h2>
-              HAPPY NEW YEAR
-            </h2>
-            :
-            isLast10Seconds?
-            <div>
-              <h1
-              className='text-9xl'>
-                {pad(timeLeft.seconds)}
-              </h1>
-            </div>
-            :
-            <div className='flex flex-col items-center justify-center gap-4'>
-              <h1>
-                {pad(timeLeft.hours)} : {pad(timeLeft.minutes)} : {pad(timeLeft.seconds)}
-              </h1>
+            {
+              hasCompleted.current ?
+              <h2>
+                HAPPY NEW YEAR
+              </h2>
+              :
+              isLast10Seconds?
+              <div>
+                <h1
+                className='text-9xl'>
+                  {pad(timeLeft.seconds)}
+                </h1>
+              </div>
+              :
+              <div className='flex flex-col items-center justify-center gap-4'>
+                <h1>
+                  {pad(timeLeft.hours)} : {pad(timeLeft.minutes)} : {pad(timeLeft.seconds)}
+                </h1>
 
-              <p className='text-2xl text-center'>
-                Until {new Date().getFullYear() + 1}
-              </p>
-            </div>
-          }
-          
-        </div>
+                <p className='text-2xl text-center'>
+                  Until {new Date().getFullYear() + 1}
+                </p>
+              </div>
+            }
+            
+          </div>
 
-      </CardTitle>
-      {
-        hasCompleted.current?
-          <Button onClick={()=>audioRef.current?.pause()}
-          className='bg-blue-500 hover:bg-blue-600'>
-            <Pause/>
-          </Button>
-        :null
-      }
-    </Card>
+        </CardTitle>
+        {
+          hasCompleted.current?
+            <Button onClick={()=>{
+              audioRef.current?.pause()
+              setAudioIsPlaying(false)
+            }}
+            className='bg-blue-500 hover:bg-blue-600'>
+              <Pause/>
+            </Button>
+          :null
+        }
+
+        
+      </Card>
+    </>
   )
 }
