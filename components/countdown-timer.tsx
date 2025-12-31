@@ -11,10 +11,10 @@ function getNextNewYear(): Date {
   const year = now.getFullYear() + 1
   
   
-  now.setSeconds(now.getSeconds()+20)
-  return now
+  // now.setSeconds(now.getSeconds()+20)
+  // return now
 
-  // return new Date(`January 1, ${year} 00:00:00`)
+  return new Date(`January 1, ${year} 00:00:00`)
 }
 
 function calculateTimeLeft(target: Date) {
@@ -67,7 +67,7 @@ export default function NewYearCountdown({audioURL}:{audioURL:string}) {
         !hasCompleted.current &&
         updated.hours === 0 &&
         updated.minutes === 0 &&
-        updated.seconds === 0
+        updated.seconds <= 0
       ) {
         hasCompleted.current = true
         onComplete()
