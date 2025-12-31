@@ -1,6 +1,6 @@
 "use client"
-import { useEffect, useRef, useState } from 'react'
-import { Card, CardFooter, CardTitle } from './ui/card'
+import { useContext, useEffect, useRef, useState } from 'react'
+import { Card, CardTitle } from './ui/card'
 import { Button } from './ui/button'
 import { Pause } from 'lucide-react'
 
@@ -34,12 +34,10 @@ function pad(value: number) {
 }
 
 
-
-export default function NewYearCountdown() {
+export default function NewYearCountdown({audioURL}:{audioURL:string}) {
   const targetDate = useRef(getNextNewYear())
   const hasCompleted = useRef(false)
   const audioRef = useRef<HTMLAudioElement>(null)
-
   
   const [isClient, setIsClient] = useState(false)
   const [isLast10Seconds,setIsLast10Seconds] = useState(false)
@@ -90,7 +88,7 @@ export default function NewYearCountdown() {
     fixed left-[50%] top-[50%] -translate-x-1/2 -translate-y-1/2' >
       <CardTitle
       className=''>
-        <audio ref={audioRef} src="/audio/test.mp3"/>
+        <audio ref={audioRef} src={audioURL}/>
         <div
         className=''>
 
@@ -125,7 +123,7 @@ export default function NewYearCountdown() {
       {
         hasCompleted.current?
           <Button onClick={()=>audioRef.current?.pause()}
-          className=''>
+          className='bg-blue-500 hover:bg-blue-600'>
             <Pause/>
           </Button>
         :null
